@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const fetchForecast = function(stationID) {
+const fetchForecast = (stationID) => {
   return axios.get(`http://bcrfc.env.gov.bc.ca/freshet/clever/${stationID}.CSV`)
     .then((response) => {
       //parse off the header
@@ -27,4 +27,6 @@ const fetchForecast = function(stationID) {
     })
     .catch(err => console.log(err.message))
 
-}
+};
+
+module.exports = fetchForecast;

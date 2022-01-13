@@ -14,7 +14,7 @@ const fetchForecast = (stationID) => {
         let hour = hourlyData[1];
         let streamflow = hourlyData.splice(2);
         hourlyData[0] !== '' ? currentDay = hourlyData[0]: currentDay = currentDay
-        console.log(currentDay, hour, streamflow);
+        //console.log(currentDay, hour, streamflow);
         
         if (streamflowData[currentDay]) {
           streamflowData[currentDay][hour] = streamflow;
@@ -23,6 +23,7 @@ const fetchForecast = (stationID) => {
         }
 
       });
+      
       return streamflowData;
     })
     .catch(err => console.log(err.message))

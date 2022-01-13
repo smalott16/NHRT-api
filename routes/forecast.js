@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
 const fetchForecast = require ('../helpers/forecast-helpers');
 
 module.exports = () => {
@@ -12,7 +11,7 @@ module.exports = () => {
     console.log(`fetching 10 day CLEVER forecast for ${stationID}\n`)
     fetchForecast(stationID)
       .then((forecast) => {
-        console.log(forecast.data);
+        res.send(forecast);
       })
 
   })

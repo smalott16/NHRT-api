@@ -38,9 +38,11 @@ const downloadRealtimeHindcast = (stationID) => {
       const rawStreamflowData = response.data.split('\n').slice(1);
 
       let streamflowData = {};
+      rawStreamflowData.forEach((record) => {
+        let recordDate = record.split(',')[1];
+        console.log(recordDate);
+      })
 
-      
-      console.log(rawStreamflowData); 
     });
 
 }

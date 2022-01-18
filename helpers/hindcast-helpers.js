@@ -21,8 +21,6 @@ const fetchRealtimeHindcast = (stationID, timeInterval) => {
       //build a data object for 
       fiveMinuteDataArray.forEach((element) => {
         let dateTimeInfo = element.id.split('.');
-        console.log(dateTimeInfo[1], dateTimeInfo[2]);
-        //console.log(element.properties.DISCHARGE)
       })
     });
 
@@ -30,7 +28,7 @@ const fetchRealtimeHindcast = (stationID, timeInterval) => {
 
 const downloadRealtimeHindcast = (stationID) => {
 
-  axios.get(`https://dd.weather.gc.ca/hydrometric/csv/BC/hourly/BC_${stationID}_hourly_hydrometric.csv`)
+  return axios.get(`https://dd.weather.gc.ca/hydrometric/csv/BC/hourly/BC_${stationID}_hourly_hydrometric.csv`)
     .then((response) => {
       
       //so far most of the data has been 5 minute interval despite being called hourly
@@ -41,17 +39,24 @@ const downloadRealtimeHindcast = (stationID) => {
       timeIntervalMins = findTimeInterval(rawStreamflowData.slice(0, 2));
       console.log(`Hindcast detected at a ${timeIntervalMins} minute interval`)
 
+      if (timeIntervalMins > 60) {
+        throw new Error("time interval is greater than 60 minutes, averaging will not work")
+      }
+
       let streamflowData = {};
       rawStreamflowData.forEach((record) => {
         let recordDate = record.split(',')[1];
-        //console.log(recordDate);
+        streamflowData[recordDate] = "test";
       })
-
+      return streamflowData;
+    
+    })
+    .catch((error) => {
+      console.log(error.message)
     });
-
 }
 
-downloadRealtimeHindcast('08NL038')
+//downloadRealtimeHindcast('08NL038')
 
 /**
  * Function used to determine what the time interval of the downloaded dataset is
@@ -72,4 +77,4 @@ const findTimeInterval = (timeArray) => {
   return interval[1] + interval[0];
 }
 
-module.exports = fetchRealtimeHindcast;
+module.exports = downloadRealtimeHindcast;

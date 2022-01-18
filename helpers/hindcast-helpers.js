@@ -37,10 +37,14 @@ const downloadRealtimeHindcast = (stationID) => {
       //I expect some data may actually be hourly this
       const rawStreamflowData = response.data.split('\n').slice(1);
 
+      //check the time interval using the first two time readings
+      timeIntervalMins = findTimeInterval(rawStreamflowData.slice(0, 2));
+      console.log(`Hindcast detected at a ${timeIntervalMins} minute interval`)
+
       let streamflowData = {};
       rawStreamflowData.forEach((record) => {
         let recordDate = record.split(',')[1];
-        console.log(recordDate);
+        //console.log(recordDate);
       })
 
     });
@@ -49,9 +53,23 @@ const downloadRealtimeHindcast = (stationID) => {
 
 downloadRealtimeHindcast('08NL038')
 
-const findtimeInterval = (time1, time2) => {
+/**
+ * Function used to determine what the time interval of the downloaded dataset is
+ * Very specifc as it relates to the format of the downloaded data
+ * @param {array} timeArray  
+ * @returns a number in minutes based on the difference between the two time readings
+ */
+const findTimeInterval = (timeArray) => {
   //return the time interval in minutes
-
+  
+  const interval = timeArray.map((timeRecord) => {
+    //parse through the time record to access the actual time interval data
+    let parsedTime = timeRecord.split(',')[1].split('T')[1].split(':');
+    console.log(parsedTime)
+    return Number(parsedTime[0]) * 60 + Number(parsedTime[1]);
+  })
+  
+  return interval[1] + interval[0];
 }
 
 module.exports = fetchRealtimeHindcast;

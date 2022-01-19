@@ -1,4 +1,5 @@
 const axios = require('axios');
+const _ = require('lodash');
 
 /**
  * @param {string} stationID Water service of canada station id number 
@@ -33,7 +34,7 @@ const downloadRealtimeHindcast = (stationID) => {
       
       //so far most of the data has been 5 minute interval despite being called hourly
       //I expect some data may actually be hourly this
-      const rawStreamflowData = response.data.split('\n').slice(1);
+      const rawStreamflowData = response.data.split('\n').slice(1, -1);
 
       //check the time interval using the first two time readings
       timeIntervalMins = findTimeInterval(rawStreamflowData.slice(0, 2));
@@ -43,12 +44,9 @@ const downloadRealtimeHindcast = (stationID) => {
         throw new Error("time interval is greater than 60 minutes, averaging will not work")
       }
 
-      let streamflowData = {};
-      rawStreamflowData.forEach((record) => {
-        let recordDate = record.split(',')[1];
-        streamflowData[recordDate] = "test";
-      })
-      return streamflowData;
+      let streamflowHindcastData = calculateHourlyAverage(rawStreamflowData);
+      
+      return streamflowHindcastData;
     
     })
     .catch((error) => {
@@ -56,7 +54,49 @@ const downloadRealtimeHindcast = (stationID) => {
     });
 }
 
-//downloadRealtimeHindcast('08NL038')
+const calculateHourlyAverage = (rawStreamflowData) => {
+  let streamflowData = {}
+  
+  //build data object that includes all data
+  rawStreamflowData.forEach((recordString) => {  
+    //parse out the important information from each record string
+    let recordArray = recordString.split(',');
+    let streamflow = Number(recordArray[6]);
+    let date = recordArray[1].split('T');
+    let day = date[0];
+    let hour = date[1].split(':')[0];
+
+    // if the day exists but the hour doesn't yet exist, set the hour value for streamflow as an array
+    if (streamflowData[day] && !streamflowData[day][hour]) {
+      streamflowData[day][hour] = [streamflow];
+    
+    // if the day exists and the hour exists set the value for streamflow add to the streamflow array
+    } else if (streamflowData[day] && streamflowData[day][hour]) {
+      currentValues = streamflowData[day][hour];
+      streamflowData[day][hour] = [...currentValues, streamflow];
+    
+    //if the day doesn not exist then set the day value equal to an object containing the hour and
+    //streamflow array  
+    } else {
+      streamflowData[day] = {[hour]: [streamflow]};
+    
+    }   
+  });
+
+  //now loop through again and average the data - REFACTOR THIS
+  let avgStreamflowData = {};
+  for (let day in streamflowData) {
+    for (let hour in streamflowData[day]) {
+      if (avgStreamflowData[day]) {
+        avgStreamflowData[day][hour] = _.mean(streamflowData[day][hour]);
+      } else {
+        avgStreamflowData[day] = {[hour]: _.mean(streamflowData[day][hour])};
+      }
+    }
+  }
+
+  return avgStreamflowData;
+}
 
 /**
  * Function used to determine what the time interval of the downloaded dataset is

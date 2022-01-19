@@ -11,7 +11,7 @@ module.exports = () => {
   router.get("/:id", (req, res) => {
 
     const stationID = req.params.id;
-    console.log(`fetching 10 day CLEVER forecast for ${stationID}\n`)
+    console.log(`fetching 10 day CLEVER forecast for ${stationID}\n`);
 
     fetchForecast(stationID)
       .then((forecast) => {

@@ -90,7 +90,6 @@ const findTimeInterval = (timeArray) => {
   const interval = timeArray.map((timeRecord) => {
     //parse through the time record to access the actual time interval data
     let parsedTime = timeRecord.split(',')[1].split('T')[1].split(':');
-    console.log(parsedTime)
     return Number(parsedTime[0]) * 60 + Number(parsedTime[1]);
   })
   

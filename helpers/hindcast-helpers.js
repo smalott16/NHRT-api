@@ -1,32 +1,12 @@
 const axios = require('axios');
 const _ = require('lodash');
 
+//note the env canada weather api did not return realtime data within the last 30 days. They are slow to publish 
+//the realtime data it seems. I have opted for the download csv route. This seems to work for the time being. 
+
 /**
  * @param {string} stationID Water service of canada station id number 
- * @param {string} timeInterval optional argument used to determine how data are aggregated, undefined/default = no averaging, h = hourly average, d = daily average
  */
-const fetchRealtimeHindcast = (stationID, timeInterval) => {
-
-  if (timeInterval && (timeInterval !== 'h' || timeInterval !== 'd')) {
-    console.log('invalid timeInterval argument, must be undefined, h or d.')
-    return;
-  }
-
-  let streamflowData= {};
-
-  axios.get(`https://api.weather.gc.ca/collections/hydrometric-realtime/items/?STATION_NUMBER=${stationID}`)
-    .then((response) => {
-      //array of objects representing data points every five minutes
-      let fiveMinuteDataArray = response.data.features;
-
-      //build a data object for 
-      fiveMinuteDataArray.forEach((element) => {
-        let dateTimeInfo = element.id.split('.');
-      })
-    });
-
-}
-
 const downloadRealtimeHindcast = (stationID) => {
 
   return axios.get(`https://dd.weather.gc.ca/hydrometric/csv/BC/hourly/BC_${stationID}_hourly_hydrometric.csv`)
